@@ -18,6 +18,7 @@ interface DataPoint {
 
 interface CompositeBarChartProps {
   label: string;
+  description: string;
   unit: string;
   lowerIsBetter: boolean;
   data: DataPoint[];
@@ -54,6 +55,7 @@ const CustomTooltip = ({
 
 export default function CompositeBarChart({
   label,
+  description,
   unit,
   lowerIsBetter,
   data,
@@ -78,13 +80,16 @@ export default function CompositeBarChart({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4">
-      <div className="flex items-start justify-between mb-3">
-        <h4 className="text-xs sm:text-sm font-medium text-slate-700 leading-tight flex-1">
-          {label}
-        </h4>
-        {lowerIsBetter && (
-          <span className="ml-2 flex-shrink-0 text-xs text-slate-400">↓ лучше</span>
-        )}
+      <div className="mb-3">
+        <div className="flex items-start justify-between">
+          <h4 className="text-xs sm:text-sm font-medium text-slate-700 leading-tight flex-1">
+            {label}
+          </h4>
+          {lowerIsBetter && (
+            <span className="ml-2 flex-shrink-0 text-xs text-slate-400">↓ лучше</span>
+          )}
+        </div>
+        <p className="text-xs text-slate-400 mt-1 leading-snug">{description}</p>
       </div>
       <ResponsiveContainer width="100%" height={180}>
         <BarChart

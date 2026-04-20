@@ -151,6 +151,7 @@ export function calcPropertyInvestment(city: CityData): number | null {
 export interface CompositeIndicator {
   key: string;
   label: string;
+  description: string;
   unit: string;
   lowerIsBetter: boolean;
   calculate: (city: CityData) => number | null;
@@ -160,6 +161,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'housing-affordability',
     label: 'Доступность жилья',
+    description: 'Аренда 1BR вне центра / зарплата после налогов. 100 = аренда бесплатна, 0 = аренда съедает всю зарплату.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcHousingAffordability,
@@ -167,6 +169,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'monthly-budget',
     label: 'Бюджет жизни',
+    description: 'Аренда + коммуналка + транспорт (проездной) + 20 обедов в кафе + интернет + мобильный. Все значения в EUR.',
     unit: '€/мес',
     lowerIsBetter: true,
     calculate: calcMonthlyBudget,
@@ -174,6 +177,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'personal-safety',
     label: 'Личная безопасность',
+    description: 'Взвешенная оценка: уровень преступности, безопасность днём и ночью, страх ограбления/нападения, коррупция.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcPersonalSafety,
@@ -181,6 +185,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'city-ecology',
     label: 'Экология города',
+    description: 'Взвешенная оценка позитивных показателей: качество воздуха, воды, чистота улиц, парки, тишина.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcCityEcology,
@@ -188,6 +193,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'healthcare',
     label: 'Здравоохранение',
+    description: 'Взвешенная оценка: квалификация врачей, оборудование, стоимость, скорость, точность, отзывчивость персонала.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcHealthcare,
@@ -195,6 +201,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'urban-mobility',
     label: 'Городская мобильность',
+    description: 'Среднее время поездки на работу и общий индекс пробок. 100 = 10 мин без пробок, 0 = 60+ мин в трафике.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcUrbanMobility,
@@ -202,6 +209,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'property-investment',
     label: 'Инвестиции в жильё',
+    description: 'Gross rental yield (аренда × 12 / цена 50 м²) и ставка ипотеки. 100 = высокая доходность + низкая ставка.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcPropertyInvestment,

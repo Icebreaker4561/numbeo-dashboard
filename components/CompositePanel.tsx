@@ -41,6 +41,7 @@ export default function CompositePanel({
               <CompositeBarChart
                 key={indicator.key}
                 label={indicator.label}
+                description={indicator.description}
                 unit={indicator.unit}
                 lowerIsBetter={indicator.lowerIsBetter}
                 data={filteredData}
