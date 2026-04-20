@@ -7,6 +7,7 @@ import { UI, tSection } from '@/lib/translations';
 import CitySelector from './CitySelector';
 import SectionAccordion from './SectionAccordion';
 import ColorLegend from './ColorLegend';
+import CompositePanel from './CompositePanel';
 
 interface DashboardProps {
   cities: CityData[];
@@ -55,6 +56,11 @@ export default function Dashboard({ cities }: DashboardProps) {
         {/* Legend */}
         {selected.length > 0 && (
           <ColorLegend cities={selected} allCities={allCityNames} />
+        )}
+
+        {/* Composite indicators */}
+        {selected.length > 0 && (
+          <CompositePanel allCities={cities} selectedCities={selectedCities} />
         )}
 
         {/* Empty state */}
