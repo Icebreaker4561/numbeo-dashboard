@@ -50,7 +50,7 @@ export function calcCostOfLiving(city: CityData): number | null {
 
 export function calcHousingAffordability(city: CityData): number | null {
   const col = city.sections['cost-of-living'];
-  const rent = safeGet(col, '1 Bedroom Apartment Outside of City Centre');
+  const rent = safeGet(col, '3 Bedroom Apartment Outside of City Centre');
   const salary = safeGet(col, 'Average Monthly Net Salary (After Tax)');
   if (rent === null || salary === null || salary === 0) return null;
   const rentEur = convertToEur(rent, city.city);
@@ -64,8 +64,9 @@ export function calcMonthlyBudget(city: CityData): number | null {
   if (rent === null) return null;
   const toEur = (v: number | null) => (v !== null ? convertToEur(v, city.city) : null);
   const meal = safeGet(col, 'Meal at an Inexpensive Restaurant');
+  const rent3br = safeGet(col, '3 Bedroom Apartment Outside of City Centre') ?? rent;
   return (
-    toEur(rent)! +                                                                                          // shared
+    convertToEur(rent3br, city.city) +                                                                      // shared
     (toEur(safeGet(col, 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)')) ?? 0) + // shared
     (toEur(safeGet(col, 'Monthly Public Transport Pass (Regular Price)')) ?? 0) * 2 +                       // ×2 persons
     (meal !== null ? convertToEur(meal, city.city) * 35 * 2 : 0) +                                         // 35 meals ×2 persons
@@ -171,16 +172,16 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'housing-affordability',
     label: 'Доступность жилья',
-    description: 'Аренда 1BR вне центра / (зарплата × 2). 100 = аренда бесплатна, 0 = аренда съедает весь доход семьи.',
+    description: 'Аренда 3BR вне центра / (зарплата × 2). 100 = аренда бесплатна, 0 = аренда съедает весь доход семьи.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcHousingAffordability,
     subMetrics: [
       {
-        label: 'Аренда 1BR вне центра',
+        label: 'Аренда 3BR вне центра',
         unit: '€',
         getValue: (c) => {
-          const v = safeGet(c.sections['cost-of-living'], '1 Bedroom Apartment Outside of City Centre');
+          const v = safeGet(c.sections['cost-of-living'], '3 Bedroom Apartment Outside of City Centre');
           return v !== null ? convertToEur(v, c.city) : null;
         },
       },
@@ -197,7 +198,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
         unit: '%',
         getValue: (c) => {
           const col = c.sections['cost-of-living'];
-          const rent = safeGet(col, '1 Bedroom Apartment Outside of City Centre');
+          const rent = safeGet(col, '3 Bedroom Apartment Outside of City Centre');
           const salary = safeGet(col, 'Average Monthly Net Salary (After Tax)');
           if (rent === null || salary === null || salary === 0) return null;
           return Math.round((convertToEur(rent, c.city) / (convertToEur(salary, c.city) * 2)) * 1000) / 10;
@@ -208,16 +209,16 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'monthly-budget',
     label: 'Бюджет жизни',
-    description: 'На двоих: аренда + коммуналка + интернет (общее) + 2× проездной + 2× мобильный + 70 обедов в кафе. Все в EUR.',
+    description: 'На двоих: 3BR аренда + коммуналка + интернет (общее) + 2× проездной + 2× мобильный + 70 обедов в кафе. Все в EUR.',
     unit: '€/мес',
     lowerIsBetter: true,
     calculate: calcMonthlyBudget,
     subMetrics: [
       {
-        label: 'Аренда 1BR вне центра',
+        label: 'Аренда 3BR вне центра',
         unit: '€',
         getValue: (c) => {
-          const v = safeGet(c.sections['cost-of-living'], '1 Bedroom Apartment Outside of City Centre');
+          const v = safeGet(c.sections['cost-of-living'], '3 Bedroom Apartment Outside of City Centre');
           return v !== null ? convertToEur(v, c.city) : null;
         },
       },
