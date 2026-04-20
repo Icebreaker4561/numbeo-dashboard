@@ -1,6 +1,6 @@
 'use client';
 
-import { getCityColor } from '@/lib/dataUtils';
+import { getCityColor, displayCityName } from '@/lib/dataUtils';
 
 interface CitySelectorProps {
   allCities: string[];
@@ -71,7 +71,7 @@ export default function CitySelector({
                 className="w-2 h-2 rounded-full flex-shrink-0"
                 style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.7)' : color }}
               />
-              {city}
+              {displayCityName(city)}
             </button>
           );
         })}

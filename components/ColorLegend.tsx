@@ -1,6 +1,6 @@
 'use client';
 
-import { getCityColor } from '@/lib/dataUtils';
+import { getCityColor, displayCityName } from '@/lib/dataUtils';
 
 interface ColorLegendProps {
   cities: string[];
@@ -23,7 +23,7 @@ export default function ColorLegend({ cities, allCities }: ColorLegendProps) {
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: getCityColor(idx >= 0 ? idx : 0) }}
               />
-              <span className="text-sm text-slate-700">{city}</span>
+              <span className="text-sm text-slate-700">{displayCityName(city)}</span>
             </div>
           );
         })}

@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { getCityColor } from '@/lib/dataUtils';
+import { getCityColor, displayCityName } from '@/lib/dataUtils';
 
 interface DataPoint {
   city: string;
@@ -55,11 +55,15 @@ export default function MetricBarChart({ metric, data, unit }: MetricBarChartPro
   // Determine all cities order from original data (to keep color indices stable)
   const allCityNames = data.map((d) => d.city);
 
-  const chartData = filtered.map((d) => ({
-    city: d.city.length > 10 ? d.city.slice(0, 10) + '…' : d.city,
-    fullCity: d.city,
-    value: d.value as number,
-  }));
+  const chartData = filtered.map((d) => {
+    const name = displayCityName(d.city);
+    return {
+      city: name.length > 12 ? name.slice(0, 12) + '…' : name,
+      fullCity: d.city,
+      displayCity: name,
+      value: d.value as number,
+    };
+  });
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4">
@@ -97,7 +101,7 @@ export default function MetricBarChart({ metric, data, unit }: MetricBarChartPro
                   payload={pl}
                   label={
                     pl && pl[0]
-                      ? (pl[0].payload as { fullCity: string }).fullCity
+                      ? (pl[0].payload as { displayCity: string }).displayCity
                       : (props.label as string)
                   }
                   unit={unit}

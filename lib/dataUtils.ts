@@ -42,6 +42,44 @@ export const DEFAULT_CITIES = [
   'Antibes',
 ];
 
+// Sections where values are monetary (prices in local currency)
+export const MONETARY_SECTIONS: SectionKey[] = ['cost-of-living', 'property-investment'];
+
+// Local currency per city slug (EUR cities are 1:1)
+const CITY_CURRENCY: Record<string, string> = {
+  Tbilisi: 'GEL',
+  Batumi: 'GEL',
+  Yerevan: 'AMD',
+};
+
+// Approximate EUR conversion rates (April 2026)
+const EUR_RATE: Record<string, number> = {
+  EUR: 1,
+  GEL: 0.34,   // 1 GEL ≈ 0.34 EUR
+  AMD: 0.0024, // 1 AMD ≈ 0.0024 EUR (1 EUR ≈ 415 AMD)
+};
+
+export function getCityCurrency(citySlug: string): string {
+  return CITY_CURRENCY[citySlug] ?? 'EUR';
+}
+
+export function convertToEur(value: number, citySlug: string): number {
+  const currency = getCityCurrency(citySlug);
+  const rate = EUR_RATE[currency] ?? 1;
+  return Math.round(value * rate * 100) / 100;
+}
+
+/** Clean display name: remove -Spain, -Portugal country suffixes */
+export function displayCityName(slug: string): string {
+  return slug
+    .replace(/-Spain$/i, '')
+    .replace(/-Portugal$/i, '')
+    .replace(/-France$/i, '')
+    .replace(/-Georgia$/i, '')
+    .replace(/-Armenia$/i, '')
+    .replace(/-/g, ' ');
+}
+
 /** Filter out cities with no metrics */
 export function filterValidCities(cities: CityData[]): CityData[] {
   return cities.filter((c) => {

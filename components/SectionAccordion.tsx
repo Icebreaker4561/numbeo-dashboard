@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getSectionMetrics, getMetricChartData } from '@/lib/dataUtils';
+import { getSectionMetrics, getMetricChartData, MONETARY_SECTIONS, convertToEur } from '@/lib/dataUtils';
 import type { CityData, SectionKey } from '@/lib/dataUtils';
 import MetricBarChart from './MetricBarChart';
 
@@ -81,16 +81,21 @@ export default function SectionAccordion({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {metrics.map((metric) => {
                 const data = getMetricChartData(allCities, sectionKey, metric);
-                // Only keep selected cities
-                const filteredData = data.filter((d) =>
-                  selectedCities.some((c) => c.city === d.city)
-                );
+                const isMonetary = MONETARY_SECTIONS.includes(sectionKey);
+                const filteredData = data
+                  .filter((d) => selectedCities.some((c) => c.city === d.city))
+                  .map((d) => ({
+                    ...d,
+                    value: isMonetary && d.value !== null
+                      ? convertToEur(d.value, d.city)
+                      : d.value,
+                  }));
                 return (
                   <MetricBarChart
                     key={metric}
                     metric={metric}
                     data={filteredData}
-                    unit={guessUnit(metric)}
+                    unit={isMonetary ? '€' : guessUnit(metric)}
                   />
                 );
               })}
