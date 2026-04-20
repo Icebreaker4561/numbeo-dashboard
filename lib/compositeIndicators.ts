@@ -54,7 +54,7 @@ export function calcHousingAffordability(city: CityData): number | null {
   const salary = safeGet(col, 'Average Monthly Net Salary (After Tax)');
   if (rent === null || salary === null || salary === 0) return null;
   const rentEur = convertToEur(rent, city.city);
-  const salaryEur = convertToEur(salary, city.city);
+  const salaryEur = convertToEur(salary, city.city) * 2; // combined household income
   return clamp(100 - (rentEur / salaryEur) * 100, 0, 100);
 }
 
@@ -65,12 +65,12 @@ export function calcMonthlyBudget(city: CityData): number | null {
   const toEur = (v: number | null) => (v !== null ? convertToEur(v, city.city) : null);
   const meal = safeGet(col, 'Meal at an Inexpensive Restaurant');
   return (
-    toEur(rent)! +
-    (toEur(safeGet(col, 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)')) ?? 0) +
-    (toEur(safeGet(col, 'Monthly Public Transport Pass (Regular Price)')) ?? 0) +
-    (meal !== null ? convertToEur(meal, city.city) * 20 : 0) +
-    (toEur(safeGet(col, 'Broadband Internet (Unlimited Data, 60 Mbps or Higher)')) ?? 0) +
-    (toEur(safeGet(col, 'Mobile Phone Plan (Monthly, with Calls and 10GB+ Data)')) ?? 0)
+    toEur(rent)! +                                                                                          // shared
+    (toEur(safeGet(col, 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)')) ?? 0) + // shared
+    (toEur(safeGet(col, 'Monthly Public Transport Pass (Regular Price)')) ?? 0) * 2 +                       // ×2 persons
+    (meal !== null ? convertToEur(meal, city.city) * 35 * 2 : 0) +                                         // 35 meals ×2 persons
+    (toEur(safeGet(col, 'Broadband Internet (Unlimited Data, 60 Mbps or Higher)')) ?? 0) +                  // shared
+    (toEur(safeGet(col, 'Mobile Phone Plan (Monthly, with Calls and 10GB+ Data)')) ?? 0) * 2               // ×2 persons
   );
 }
 
@@ -171,7 +171,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'housing-affordability',
     label: 'Доступность жилья',
-    description: 'Аренда 1BR вне центра / зарплата после налогов. 100 = аренда бесплатна, 0 = аренда съедает всю зарплату.',
+    description: 'Аренда 1BR вне центра / (зарплата × 2). 100 = аренда бесплатна, 0 = аренда съедает весь доход семьи.',
     unit: '',
     lowerIsBetter: false,
     calculate: calcHousingAffordability,
@@ -185,22 +185,22 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
         },
       },
       {
-        label: 'Зарплата после налогов',
+        label: 'Зарплата (2 чел.)',
         unit: '€',
         getValue: (c) => {
           const v = safeGet(c.sections['cost-of-living'], 'Average Monthly Net Salary (After Tax)');
-          return v !== null ? convertToEur(v, c.city) : null;
+          return v !== null ? convertToEur(v, c.city) * 2 : null;
         },
       },
       {
-        label: 'Доля аренды от зарплаты',
+        label: 'Доля аренды от дохода семьи',
         unit: '%',
         getValue: (c) => {
           const col = c.sections['cost-of-living'];
           const rent = safeGet(col, '1 Bedroom Apartment Outside of City Centre');
           const salary = safeGet(col, 'Average Monthly Net Salary (After Tax)');
           if (rent === null || salary === null || salary === 0) return null;
-          return Math.round((convertToEur(rent, c.city) / convertToEur(salary, c.city)) * 1000) / 10;
+          return Math.round((convertToEur(rent, c.city) / (convertToEur(salary, c.city) * 2)) * 1000) / 10;
         },
       },
     ],
@@ -208,7 +208,7 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
   {
     key: 'monthly-budget',
     label: 'Бюджет жизни',
-    description: 'Аренда + коммуналка + транспорт (проездной) + 20 обедов в кафе + интернет + мобильный. Все значения в EUR.',
+    description: 'На двоих: аренда + коммуналка + интернет (общее) + 2× проездной + 2× мобильный + 70 обедов в кафе. Все в EUR.',
     unit: '€/мес',
     lowerIsBetter: true,
     calculate: calcMonthlyBudget,
@@ -230,19 +230,19 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
         },
       },
       {
-        label: 'Проездной на месяц',
+        label: 'Проездной (2 чел.)',
         unit: '€',
         getValue: (c) => {
           const v = safeGet(c.sections['cost-of-living'], 'Monthly Public Transport Pass (Regular Price)');
-          return v !== null ? convertToEur(v, c.city) : null;
+          return v !== null ? convertToEur(v, c.city) * 2 : null;
         },
       },
       {
-        label: '20 обедов в кафе',
+        label: '70 обедов в кафе (2×35)',
         unit: '€',
         getValue: (c) => {
           const v = safeGet(c.sections['cost-of-living'], 'Meal at an Inexpensive Restaurant');
-          return v !== null ? convertToEur(v, c.city) * 20 : null;
+          return v !== null ? convertToEur(v, c.city) * 70 : null;
         },
       },
       {
@@ -254,11 +254,11 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
         },
       },
       {
-        label: 'Мобильный тариф',
+        label: 'Мобильный (2 чел.)',
         unit: '€',
         getValue: (c) => {
           const v = safeGet(c.sections['cost-of-living'], 'Mobile Phone Plan (Monthly, with Calls and 10GB+ Data)');
-          return v !== null ? convertToEur(v, c.city) : null;
+          return v !== null ? convertToEur(v, c.city) * 2 : null;
         },
       },
     ],

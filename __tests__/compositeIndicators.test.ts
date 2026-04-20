@@ -146,10 +146,11 @@ describe('weightedMean', () => {
 });
 
 describe('calcHousingAffordability', () => {
-  it('returns score for Barcelona (rent/salary ~0.54 → ~46)', () => {
+  it('returns score for Barcelona using combined salary (rent / salary×2)', () => {
     const score = calcHousingAffordability(barcelonaData);
     expect(score).not.toBeNull();
-    expect(score!).toBeCloseTo(100 - (1108.92 / 2069.1) * 100, 0);
+    // rent / (salary × 2) = 1108.92 / (2069.1 × 2) ≈ 0.268 → score ≈ 73.2
+    expect(score!).toBeCloseTo(100 - (1108.92 / (2069.1 * 2)) * 100, 0);
   });
   it('returns null when rent is missing', () => {
     const city: CityData = {
@@ -170,23 +171,22 @@ describe('calcHousingAffordability', () => {
 });
 
 describe('calcMonthlyBudget', () => {
-  it('returns EUR budget for Barcelona', () => {
+  it('returns EUR budget for Barcelona (2 persons, 35 meals each)', () => {
     const budget = calcMonthlyBudget(barcelonaData);
     expect(budget).not.toBeNull();
-    // rent + utilities + transport + meals*20 + broadband + mobile
-    const expected = 1108.92 + 156.69 + 22 + 15 * 20 + 33 + 16.2;
+    // rent + utilities + transport×2 + meals×70 + broadband + mobile×2
+    const expected = 1108.92 + 156.69 + 22 * 2 + 15 * 70 + 33 + 16.2 * 2;
     expect(budget!).toBeCloseTo(expected, 0);
   });
-  it('converts AMD to EUR for Yerevan', () => {
+  it('converts AMD to EUR for Yerevan (2 persons)', () => {
     const budget = calcMonthlyBudget(yerevanData);
     expect(budget).not.toBeNull();
-    // values in AMD * 0.0024
     const rentEur = 200000 * 0.0024;
     const utilitiesEur = 30000 * 0.0024;
-    const transportEur = 5000 * 0.0024;
-    const mealsEur = 3000 * 0.0024 * 20;
+    const transportEur = 5000 * 0.0024 * 2;
+    const mealsEur = 3000 * 0.0024 * 70;
     const broadbandEur = 5000 * 0.0024;
-    const mobileEur = 3000 * 0.0024;
+    const mobileEur = 3000 * 0.0024 * 2;
     const expected = rentEur + utilitiesEur + transportEur + mealsEur + broadbandEur + mobileEur;
     expect(budget!).toBeCloseTo(expected, 0);
   });
