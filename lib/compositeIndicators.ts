@@ -157,7 +157,19 @@ export interface CompositeIndicator {
   calculate: (city: CityData) => number | null;
 }
 
+export function calcCostOfLiving(city: CityData): number | null {
+  return safeGet(city.sections['quality-of-life'], 'Cost of Living Index');
+}
+
 export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
+  {
+    key: 'cost-of-living-index',
+    label: 'Стоимость жизни',
+    description: 'Индекс Numbeo относительно Нью-Йорка (NYC = 100). Охватывает жильё, продукты, рестораны, транспорт. Чем ниже — тем дешевле.',
+    unit: '',
+    lowerIsBetter: true,
+    calculate: calcCostOfLiving,
+  },
   {
     key: 'housing-affordability',
     label: 'Доступность жилья',

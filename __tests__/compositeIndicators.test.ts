@@ -2,6 +2,7 @@ import {
   safeGet,
   clamp,
   weightedMean,
+  calcCostOfLiving,
   calcHousingAffordability,
   calcMonthlyBudget,
   calcPersonalSafety,
@@ -42,6 +43,9 @@ const barcelonaData: CityData = {
       'Satisfaction with responsiveness (waitings) in medical institutions': 66.07,
       'Satisfaction with cost to you': 68.6,
       'Convenience of location for you': 80.95,
+    },
+    'quality-of-life': {
+      'Cost of Living Index': 59.28,
     },
     pollution: {
       'Air quality': 39.46,
@@ -299,5 +303,15 @@ describe('calcPropertyInvestment', () => {
       sections: { 'property-investment': { '1 Bedroom Apartment Outside of City Centre': 1000 } },
     };
     expect(calcPropertyInvestment(city)).toBeNull();
+  });
+});
+
+describe('calcCostOfLiving', () => {
+  it('returns Cost of Living Index from quality-of-life for Barcelona', () => {
+    expect(calcCostOfLiving(barcelonaData)).toBeCloseTo(59.28);
+  });
+  it('returns null when quality-of-life section is missing', () => {
+    const city: CityData = { city: 'X', scrapedAt: '', sections: {} };
+    expect(calcCostOfLiving(city)).toBeNull();
   });
 });
