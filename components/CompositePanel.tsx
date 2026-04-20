@@ -44,6 +44,7 @@ export default function CompositePanel({
                 description={indicator.description}
                 unit={indicator.unit}
                 lowerIsBetter={indicator.lowerIsBetter}
+                scaleToData={indicator.scaleToData}
                 data={filteredData}
                 allCityNames={allCityNames}
                 subMetrics={indicator.subMetrics}

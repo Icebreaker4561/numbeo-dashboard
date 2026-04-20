@@ -40,6 +40,7 @@ export interface CompositeIndicator {
   lowerIsBetter: boolean;
   calculate: (city: CityData) => number | null;
   subMetrics: SubMetric[];
+  scaleToData?: boolean;
 }
 
 // ─── Calculators ─────────────────────────────────────────────────────────────
@@ -155,6 +156,21 @@ export function calcPropertyInvestment(city: CityData): number | null {
     return yieldScore * 0.65 + clamp(((15 - mortgageRate) / 13) * 100, 0, 100) * 0.35;
   }
   return yieldScore;
+}
+
+export function calcNetRentalYield(city: CityData): number | null {
+  const pi = city.sections['property-investment'];
+  const col = city.sections['cost-of-living'];
+  const rent = safeGet(pi, '1 Bedroom Apartment Outside of City Centre');
+  const priceM2 = safeGet(pi, 'Price per Square Meter to Buy Apartment Outside of Centre');
+  if (rent === null || priceM2 === null) return null;
+  const rentEur = convertToEur(rent, city.city);
+  const priceM2Eur = convertToEur(priceM2, city.city);
+  if (priceM2Eur === 0) return null;
+  const utilities = safeGet(col, 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)');
+  const utilitiesEur = utilities !== null ? convertToEur(utilities, city.city) : 0;
+  const propertyValue = priceM2Eur * 50;
+  return Math.round(((rentEur - utilitiesEur) * 12) / propertyValue * 1000) / 10;
 }
 
 // ─── Indicator definitions ────────────────────────────────────────────────────
@@ -405,6 +421,55 @@ export const COMPOSITE_INDICATORS: CompositeIndicator[] = [
         label: 'Ставка ипотеки (20 лет)',
         unit: '%',
         getValue: (c) => safeGet(c.sections['property-investment'], 'Annual Mortgage Interest Rate (20-Year Fixed, in %)'),
+      },
+    ],
+  },
+  {
+    key: 'net-rental-yield',
+    label: 'Чистая доходность аренды',
+    description: '(Аренда − Коммуналка) × 12 / (Цена м² × 50) × 100. Чистый годовой доход от 1BR квартиры за вычетом расходов на содержание.',
+    unit: '%',
+    lowerIsBetter: false,
+    scaleToData: true,
+    calculate: calcNetRentalYield,
+    subMetrics: [
+      {
+        label: 'Аренда 1BR вне центра',
+        unit: '€',
+        getValue: (c) => {
+          const v = safeGet(c.sections['property-investment'], '1 Bedroom Apartment Outside of City Centre');
+          return v !== null ? convertToEur(v, c.city) : null;
+        },
+      },
+      {
+        label: 'Коммуналка 85м²',
+        unit: '€',
+        getValue: (c) => {
+          const v = safeGet(c.sections['cost-of-living'], 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)');
+          return v !== null ? convertToEur(v, c.city) : null;
+        },
+      },
+      {
+        label: 'Чистый доход в год',
+        unit: '€',
+        getValue: (c) => {
+          const pi = c.sections['property-investment'];
+          const col = c.sections['cost-of-living'];
+          const rent = safeGet(pi, '1 Bedroom Apartment Outside of City Centre');
+          if (rent === null) return null;
+          const rentEur = convertToEur(rent, c.city);
+          const utilities = safeGet(col, 'Basic Utilities for 85 m2 Apartment (Electricity, Heating, Cooling, Water, Garbage)');
+          const utilitiesEur = utilities !== null ? convertToEur(utilities, c.city) : 0;
+          return Math.round((rentEur - utilitiesEur) * 12);
+        },
+      },
+      {
+        label: 'Стоимость квартиры (50м²)',
+        unit: '€',
+        getValue: (c) => {
+          const v = safeGet(c.sections['property-investment'], 'Price per Square Meter to Buy Apartment Outside of Centre');
+          return v !== null ? Math.round(convertToEur(v, c.city) * 50) : null;
+        },
       },
     ],
   },

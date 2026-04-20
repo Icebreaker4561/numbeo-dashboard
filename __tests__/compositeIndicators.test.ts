@@ -10,6 +10,7 @@ import {
   calcHealthcare,
   calcUrbanMobility,
   calcPropertyInvestment,
+  calcNetRentalYield,
 } from '../lib/compositeIndicators';
 import type { CityData } from '../lib/dataUtils';
 
@@ -315,5 +316,35 @@ describe('calcCostOfLiving', () => {
   it('returns null when quality-of-life section is missing', () => {
     const city: CityData = { city: 'X', scrapedAt: '', sections: {} };
     expect(calcCostOfLiving(city)).toBeNull();
+  });
+});
+
+describe('calcNetRentalYield', () => {
+  it('returns net yield % for Barcelona', () => {
+    // rent=1108.92, utilities=156.69, priceM2=4202.5
+    // netYield = (1108.92 - 156.69) * 12 / (4202.5 * 50) * 100
+    //          = 952.23 * 12 / 210125 * 100 ≈ 5.44%
+    const yield_ = calcNetRentalYield(barcelonaData);
+    expect(yield_).not.toBeNull();
+    expect(yield_!).toBeCloseTo(5.4, 0);
+  });
+  it('returns null when rent data is missing', () => {
+    const city: CityData = { city: 'X', scrapedAt: '', sections: {} };
+    expect(calcNetRentalYield(city)).toBeNull();
+  });
+  it('returns null when price data is missing', () => {
+    const city: CityData = {
+      city: 'X',
+      scrapedAt: '',
+      sections: { 'property-investment': { '1 Bedroom Apartment Outside of City Centre': 1000 } },
+    };
+    expect(calcNetRentalYield(city)).toBeNull();
+  });
+  it('converts AMD to EUR for Yerevan', () => {
+    const yield_ = calcNetRentalYield(yerevanData);
+    // rent=200000 AMD → 480 EUR, utilities=30000 AMD → 72 EUR, priceM2=500000 AMD → 1200 EUR
+    // netYield = (480 - 72) * 12 / (1200 * 50) * 100 = 4896 / 60000 * 100 ≈ 8.16%
+    expect(yield_).not.toBeNull();
+    expect(yield_!).toBeCloseTo(8.2, 0);
   });
 });

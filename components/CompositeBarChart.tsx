@@ -24,6 +24,7 @@ interface CompositeBarChartProps {
   description: string;
   unit: string;
   lowerIsBetter: boolean;
+  scaleToData?: boolean;
   data: DataPoint[];
   allCityNames: string[];
   subMetrics: SubMetric[];
@@ -61,6 +62,7 @@ export default function CompositeBarChart({
   description,
   unit,
   lowerIsBetter,
+  scaleToData,
   data,
   allCityNames,
   subMetrics,
@@ -119,7 +121,7 @@ export default function CompositeBarChart({
               axisLine={false}
               tickLine={false}
               width={42}
-              domain={[0, lowerIsBetter ? maxVal * 1.1 : 100]}
+              domain={[0, (lowerIsBetter || scaleToData) ? maxVal * 1.1 : 100]}
               tickFormatter={(v: number) =>
                 v >= 1000
                   ? `${(v / 1000).toFixed(0)}k`
