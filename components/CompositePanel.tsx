@@ -46,6 +46,8 @@ export default function CompositePanel({
                 lowerIsBetter={indicator.lowerIsBetter}
                 data={filteredData}
                 allCityNames={allCityNames}
+                subMetrics={indicator.subMetrics}
+                selectedCities={selectedCities}
               />
             );
           })}
