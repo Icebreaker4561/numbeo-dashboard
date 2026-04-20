@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import type { CityData, SectionKey } from '@/lib/dataUtils';
-import { SECTION_KEYS, SECTION_LABELS, DEFAULT_CITIES } from '@/lib/dataUtils';
+import { SECTION_KEYS, DEFAULT_CITIES } from '@/lib/dataUtils';
+import { UI, tSection } from '@/lib/translations';
 import CitySelector from './CitySelector';
 import SectionAccordion from './SectionAccordion';
 import ColorLegend from './ColorLegend';
@@ -34,10 +35,10 @@ export default function Dashboard({ cities }: DashboardProps) {
           </div>
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
-              Numbeo City Dashboard
+              {UI.title}
             </h1>
             <p className="text-xs text-slate-500 hidden sm:block">
-              Compare {cities.length} cities across 7 categories
+              {UI.subtitle(cities.length, 7)}
             </p>
           </div>
         </div>
@@ -59,7 +60,7 @@ export default function Dashboard({ cities }: DashboardProps) {
         {/* Empty state */}
         {selected.length === 0 && (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm py-16 text-center">
-            <p className="text-slate-400 text-base">Select at least one city to see charts.</p>
+            <p className="text-slate-400 text-base">{UI.selectOneCity}</p>
           </div>
         )}
 
@@ -68,7 +69,7 @@ export default function Dashboard({ cities }: DashboardProps) {
           SECTION_KEYS.map((sectionKey: SectionKey, i) => (
             <SectionAccordion
               key={sectionKey}
-              label={SECTION_LABELS[sectionKey]}
+              label={tSection(sectionKey)}
               sectionKey={sectionKey}
               allCities={cities}
               selectedCities={selectedCities}
@@ -78,7 +79,7 @@ export default function Dashboard({ cities }: DashboardProps) {
 
         {/* Footer */}
         <footer className="text-center text-xs text-slate-400 py-4">
-          Data sourced from Numbeo · Scraped {new Date(cities[0]?.scrapedAt ?? '').toLocaleDateString()}
+          {UI.footer(new Date(cities[0]?.scrapedAt ?? '').toLocaleDateString('ru-RU'))}
         </footer>
       </main>
     </div>

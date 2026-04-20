@@ -1,6 +1,7 @@
 'use client';
 
 import { getCityColor, displayCityName } from '@/lib/dataUtils';
+import { UI } from '@/lib/translations';
 
 interface ColorLegendProps {
   cities: string[];
@@ -12,7 +13,7 @@ export default function ColorLegend({ cities, allCities }: ColorLegendProps) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 px-4 sm:px-6 py-4">
       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-        Color Legend
+        {UI.colorLegend}
       </p>
       <div className="flex flex-wrap gap-x-4 gap-y-2">
         {cities.map((city) => {

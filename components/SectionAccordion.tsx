@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { getSectionMetrics, getMetricChartData, MONETARY_SECTIONS, convertToEur } from '@/lib/dataUtils';
+import { getSectionMetrics, getMetricChartData, MONETARY_SECTIONS, convertToEur, shouldConvertToEur } from '@/lib/dataUtils';
 import type { CityData, SectionKey } from '@/lib/dataUtils';
+import { UI, t } from '@/lib/translations';
 import MetricBarChart from './MetricBarChart';
 
 interface SectionAccordionProps {
@@ -56,7 +57,7 @@ export default function SectionAccordion({
         <span className="flex items-center gap-2">
           {hasData && (
             <span className="text-xs text-slate-400 font-normal hidden sm:inline">
-              {metrics.length} metrics · {selectedCities.length} cities
+              {UI.metricsCount(metrics.length, selectedCities.length)}
             </span>
           )}
           <svg
@@ -75,13 +76,13 @@ export default function SectionAccordion({
         <div className="border-t border-slate-100 px-4 sm:px-6 pb-6 pt-4">
           {!hasData ? (
             <p className="text-sm text-slate-400 py-4 text-center">
-              No data available. Select at least one city.
+              {UI.noData}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {metrics.map((metric) => {
                 const data = getMetricChartData(allCities, sectionKey, metric);
-                const isMonetary = MONETARY_SECTIONS.includes(sectionKey);
+                const isMonetary = MONETARY_SECTIONS.includes(sectionKey) && shouldConvertToEur(metric);
                 const filteredData = data
                   .filter((d) => selectedCities.some((c) => c.city === d.city))
                   .map((d) => ({
@@ -93,7 +94,7 @@ export default function SectionAccordion({
                 return (
                   <MetricBarChart
                     key={metric}
-                    metric={metric}
+                    metric={t(metric)}
                     data={filteredData}
                     unit={isMonetary ? '€' : guessUnit(metric)}
                   />

@@ -1,6 +1,7 @@
 'use client';
 
 import { getCityColor, displayCityName } from '@/lib/dataUtils';
+import { UI } from '@/lib/translations';
 
 interface CitySelectorProps {
   allCities: string[];
@@ -28,9 +29,9 @@ export default function CitySelector({
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="text-base font-semibold text-slate-800">
-          Select Cities
+          {UI.selectCities}
           <span className="ml-2 text-sm font-normal text-slate-500">
-            ({selected.length} selected)
+            ({UI.selected(selected.length)})
           </span>
         </h2>
         <div className="flex gap-2">
@@ -38,13 +39,13 @@ export default function CitySelector({
             onClick={selectAll}
             className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
           >
-            All
+            {UI.all}
           </button>
           <button
             onClick={clearAll}
             className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
           >
-            None
+            {UI.none}
           </button>
         </div>
       </div>

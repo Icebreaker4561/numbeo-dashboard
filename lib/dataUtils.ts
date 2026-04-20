@@ -69,6 +69,14 @@ export function convertToEur(value: number, citySlug: string): number {
   return Math.round(value * rate * 100) / 100;
 }
 
+// Some metrics in monetary sections are % or ratios — don't convert
+const NON_MONETARY_KEYWORDS = ['rate', 'ratio', 'index', '%'];
+
+export function shouldConvertToEur(metricName: string): boolean {
+  const lower = metricName.toLowerCase();
+  return !NON_MONETARY_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
 /** Clean display name: remove -Spain, -Portugal country suffixes */
 export function displayCityName(slug: string): string {
   return slug
